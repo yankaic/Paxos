@@ -5,10 +5,19 @@
  */
 package view;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.HeadlessException;
+import java.awt.MouseInfo;
+import java.awt.Point;
+import java.awt.RenderingHints;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -16,7 +25,10 @@ import java.awt.event.MouseMotionListener;
  */
 public class Simulation extends javax.swing.JFrame {
 
-  Node incompleteNode;
+  private Node incompleteNode;
+  private Edge incompleteEdge;
+  private ArrayList<Node> nodes;
+  private MouseAdapter nodeMouseClicked;
 
   /**
    * Creates new form Simulation
@@ -24,11 +36,12 @@ public class Simulation extends javax.swing.JFrame {
   public Simulation() {
     initComponents();
 
-    nodePanel.addMouseMotionListener(new MouseMotionListener() {
-      @Override
-      public void mouseDragged(MouseEvent e) {
-      }
+    init();
 
+  }
+
+  private void init() {
+    nodePanel.addMouseMotionListener(new MouseAdapter() {
       @Override
       public void mouseMoved(MouseEvent e) {
         if (incompleteNode != null) {
@@ -37,6 +50,32 @@ public class Simulation extends javax.swing.JFrame {
       }
     }
     );
+    nodes = new ArrayList<>();
+
+    this.addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyTyped(KeyEvent e) {
+        if (incompleteNode != null) {
+          nodePanel.remove(incompleteNode);
+          incompleteNode = null;
+          repaint();
+        }
+      }
+    }
+    );
+
+    nodeMouseClicked = new MouseAdapter() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        nodes.add(incompleteNode);
+        incompleteNode.removeMouseListener(nodeMouseClicked);
+        incompleteNode.createRouter();
+        incompleteNode = null;
+      }
+    };
+
+    refresh();
+
   }
 
   /**
@@ -49,15 +88,20 @@ public class Simulation extends javax.swing.JFrame {
   private void initComponents() {
 
     jToolBar1 = new javax.swing.JToolBar();
-    jButton1 = new javax.swing.JButton();
-    jButton2 = new javax.swing.JButton();
+    addNodeButton = new javax.swing.JButton();
+    addEdgeButton = new javax.swing.JButton();
     jSeparator1 = new javax.swing.JToolBar.Separator();
     jScrollPane1 = new javax.swing.JScrollPane();
-    nodePanel = new javax.swing.JPanel();
-    node1 = new view.Node();
-    node2 = new view.Node();
-    node3 = new view.Node();
-    node4 = new view.Node();
+    nodePanel = new javax.swing.JPanel(){
+      @Override
+      public void paintComponent(Graphics gph) {
+        super.paintComponent(gph);
+        Graphics2D graphics = (Graphics2D) gph.create();
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        paintNodePanel(graphics);
+
+      }
+    };
     jMenuBar1 = new javax.swing.JMenuBar();
     jMenu1 = new javax.swing.JMenu();
     jMenu2 = new javax.swing.JMenu();
@@ -69,22 +113,27 @@ public class Simulation extends javax.swing.JFrame {
     jToolBar1.setFloatable(false);
     jToolBar1.setRollover(true);
 
-    jButton1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/addIcon.png"))); // NOI18N
-    jButton1.setFocusable(false);
-    jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-    jButton1.addActionListener(new java.awt.event.ActionListener() {
+    addNodeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/addIcon.png"))); // NOI18N
+    addNodeButton.setFocusable(false);
+    addNodeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    addNodeButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    addNodeButton.addActionListener(new java.awt.event.ActionListener() {
       public void actionPerformed(java.awt.event.ActionEvent evt) {
-        jButton1ActionPerformed(evt);
+        addNodeButtonActionPerformed(evt);
       }
     });
-    jToolBar1.add(jButton1);
+    jToolBar1.add(addNodeButton);
 
-    jButton2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/edgeIcon.png"))); // NOI18N
-    jButton2.setFocusable(false);
-    jButton2.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-    jButton2.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-    jToolBar1.add(jButton2);
+    addEdgeButton.setIcon(new javax.swing.ImageIcon(getClass().getResource("/icons/edgeIcon.png"))); // NOI18N
+    addEdgeButton.setFocusable(false);
+    addEdgeButton.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+    addEdgeButton.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+    addEdgeButton.addActionListener(new java.awt.event.ActionListener() {
+      public void actionPerformed(java.awt.event.ActionEvent evt) {
+        addEdgeButtonActionPerformed(evt);
+      }
+    });
+    jToolBar1.add(addEdgeButton);
     jToolBar1.add(jSeparator1);
 
     getContentPane().add(jToolBar1, java.awt.BorderLayout.PAGE_START);
@@ -95,17 +144,6 @@ public class Simulation extends javax.swing.JFrame {
     nodePanel.setBackground(new java.awt.Color(255, 255, 255));
     nodePanel.setMinimumSize(new java.awt.Dimension(500, 400));
     nodePanel.setLayout(null);
-
-    node1.setBackground(new java.awt.Color(255, 0, 51));
-    nodePanel.add(node1);
-    node1.setBounds(128, 173, 45, 45);
-    nodePanel.add(node2);
-    node2.setBounds(219, 265, 45, 45);
-    nodePanel.add(node3);
-    node3.setBounds(233, 122, 45, 45);
-    nodePanel.add(node4);
-    node4.setBounds(44, 287, 45, 45);
-
     jScrollPane1.setViewportView(nodePanel);
 
     getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
@@ -121,19 +159,35 @@ public class Simulation extends javax.swing.JFrame {
     pack();
   }// </editor-fold>//GEN-END:initComponents
 
-  private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+  private void addNodeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNodeButtonActionPerformed
     incompleteNode = new Node();
     incompleteNode.setLocation(20, 20);
     nodePanel.add(incompleteNode);
 
+    incompleteNode.addMouseListener(nodeMouseClicked);
     incompleteNode.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseClicked(MouseEvent e) {
-        incompleteNode = null;
+        if (incompleteEdge != null) {
+          if (incompleteEdge.isEmpty()) {
+            Node node = (Node) e.getSource();
+            incompleteEdge.add(node);
+          }
+          else {
+            Node A = incompleteEdge.getA();
+            Node B = (Node) e.getSource();
+            A.connect(B);
+            B.connect(A);
+            incompleteEdge = null;
+          }
+        }
       }
-    }
-    );
-  }//GEN-LAST:event_jButton1ActionPerformed
+    });
+  }//GEN-LAST:event_addNodeButtonActionPerformed
+
+  private void addEdgeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addEdgeButtonActionPerformed
+    createEdge();
+  }//GEN-LAST:event_addEdgeButtonActionPerformed
 
   /**
    * @param args the command line arguments
@@ -168,18 +222,79 @@ public class Simulation extends javax.swing.JFrame {
   }
 
   // Variables declaration - do not modify//GEN-BEGIN:variables
-  private javax.swing.JButton jButton1;
-  private javax.swing.JButton jButton2;
+  private javax.swing.JButton addEdgeButton;
+  private javax.swing.JButton addNodeButton;
   private javax.swing.JMenu jMenu1;
   private javax.swing.JMenu jMenu2;
   private javax.swing.JMenuBar jMenuBar1;
   private javax.swing.JScrollPane jScrollPane1;
   private javax.swing.JToolBar.Separator jSeparator1;
   private javax.swing.JToolBar jToolBar1;
-  private view.Node node1;
-  private view.Node node2;
-  private view.Node node3;
-  private view.Node node4;
   private javax.swing.JPanel nodePanel;
   // End of variables declaration//GEN-END:variables
+
+  private void createEdge() {
+    incompleteEdge = new Edge();
+  }
+
+  public void refresh() {
+    new Thread() {
+      @Override
+      public void run() {
+        while (true) {
+          try {
+            nodePanel.repaint();
+            sleep(1000 / 60);
+          }
+          catch (InterruptedException ex) {
+            Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
+          }
+        }
+      }
+    }.start();
+  }
+
+  public void paintNodePanel(Graphics2D graphics) {
+    paintIncompleteLine(graphics);
+    paintDirectConnections(graphics);
+    
+    
+
+  }
+
+  private void paintDirectConnections(Graphics2D graphics) {
+    for (int i = 0; i < nodes.size(); i++) {
+      Node origin = nodes.get(i);
+      ArrayList<Node> connections = origin.getConnections();
+      for (int j = 0; j < connections.size(); j++) {
+        Node destination = connections.get(j);
+        Point A = origin.getCenter();
+        Point B = destination.getCenter();
+        graphics.drawLine(A.x, A.y, B.x, B.y);
+      }      
+    }
+  }
+  
+  public Node getNode(String name, Node node){
+    final ArrayList<Node> list = node.getConnections();
+    for (int i = 0; i < list.size(); i++) {
+      if(name.equals(list.get(i).getRouter().getPort()+"")){
+        return list.get(i);
+      }      
+    }
+    return null;
+  }
+
+  private void paintIncompleteLine(Graphics2D graphics) throws HeadlessException {
+    if (incompleteEdge != null && incompleteEdge.isIncomplete()) {
+      Point center = incompleteEdge.getA().getCenter();
+      Point panel = nodePanel.getLocationOnScreen();
+      Point pointer = MouseInfo.getPointerInfo().getLocation();
+
+      int x = pointer.x - panel.x;
+      int y = pointer.y - panel.y;
+
+      graphics.drawLine(center.x, center.y, x, y);
+    }
+  }
 }

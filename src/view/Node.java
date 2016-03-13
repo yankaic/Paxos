@@ -17,6 +17,8 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
+import java.util.ArrayList;
+import network.Router;
 
 /**
  *
@@ -25,6 +27,8 @@ import java.awt.event.MouseMotionListener;
 public class Node extends javax.swing.JPanel {
 
   private static char name = 'A';
+  private Router router;
+  private ArrayList<Node> connections;
 
   /**
    * Creates new form Node
@@ -32,6 +36,7 @@ public class Node extends javax.swing.JPanel {
   public Node() {
     initComponents();
     init();
+    connections = new ArrayList<>();
   }
 
   private void init() {
@@ -41,9 +46,28 @@ public class Node extends javax.swing.JPanel {
     setSize(45, 45);
     label.setSize(45, 45);
   }
+
+  public void createRouter() {
+    router = new Router();
+  }
+
+  public void connect(Node B) {
+    router.connect(B.getRouter().getPort() + "", distance(this, B));
+    connections.add(B);
+  }
+
+  public Router getRouter() {
+    return router;
+  }
+
+  public ArrayList<Node> getConnections() {
+    return connections;
+  }
   
+  
+
   @Override
-  public String getName(){
+  public String getName() {
     return label.getText();
   }
 
@@ -74,6 +98,13 @@ public class Node extends javax.swing.JPanel {
     });
   }
 
+  public Point getCenter() {
+    Point center = getLocation();
+    center.x += getWidth() / 2;
+    center.y += getHeight() / 2;
+    return center;
+  }
+
   @Override
   public void paintComponent(Graphics gph) {
     Graphics2D graphics = (Graphics2D) gph.create();
@@ -90,6 +121,11 @@ public class Node extends javax.swing.JPanel {
   private final Color backColor = new Color(245, 245, 245);
 
   ;
+  
+  @Override
+  public String toString() {
+    return label.getText();
+  }
 
   /**
    * This method is called from within the constructor to initialize the form.
@@ -121,4 +157,8 @@ public class Node extends javax.swing.JPanel {
   // Variables declaration - do not modify//GEN-BEGIN:variables
   private javax.swing.JLabel label;
   // End of variables declaration//GEN-END:variables
+
+  public static int distance(Node A, Node B) {
+    return (int) A.getCenter().distance(B.getCenter());
+  }
 }

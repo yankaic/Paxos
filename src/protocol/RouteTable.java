@@ -1,26 +1,36 @@
 package protocol;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author Yan Kaic
  */
-public class RouteTable extends ArrayList<TableLine> {
+public class RouteTable extends ArrayList<TableLine> implements Serializable {
+  
+static char lastId = 'A';
+private char id;
 
-  private final String author;
+  private String author;
 
-  public RouteTable(String author) {
-    this.author = author;
+  public RouteTable() {
     init();
   }
 
   private void init() {
     add(author, author, 0);
+    id = lastId++;
   }
 
   public String getAuthor() {
     return author;
+  }
+
+  public void autentic(String author) {
+    this.author = author;
+    remove(0);
+    add(0, new TableLine(author, author, 0));
   }
 
   public boolean has(TableLine search) {
@@ -90,7 +100,7 @@ public class RouteTable extends ArrayList<TableLine> {
 
   @Override
   public String toString() {
-    String output = "Author: " + author + '\n';
+    String output = "Author: " + author + "\t id:"+id+'\n';
     for (TableLine line : this) {
       output += line.toString() + '\n';
     }
@@ -101,11 +111,11 @@ public class RouteTable extends ArrayList<TableLine> {
     TableLine line = null;
     for (int x = 0; x < size(); x++) {
       line = get(x);
-      if(line.getLink().equals(link)){
+      if (line.getLink().equals(link)) {
         break;
       }
     }
-    if(line!=null){
+    if (line != null) {
       remove(line);
     }
   }

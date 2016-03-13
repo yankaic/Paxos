@@ -5,11 +5,13 @@
  */
 package protocol;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Yan Kaic
  */
-public class PresentationMessage {
+public class PresentationMessage implements Serializable{
 
   public String name;
   public int distance;

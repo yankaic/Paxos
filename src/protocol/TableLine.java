@@ -1,10 +1,12 @@
 package protocol;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Yan Kaic
  */
-public class TableLine {
+public class TableLine implements Serializable {
 
   protected String target;
   protected String link;
