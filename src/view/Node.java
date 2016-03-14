@@ -15,6 +15,8 @@ import java.awt.HeadlessException;
 import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
@@ -45,6 +47,17 @@ public class Node extends javax.swing.JPanel {
     mouseEvents();
     setSize(45, 45);
     label.setSize(45, 45);
+
+    addComponentListener(new ComponentAdapter() {
+      @Override
+      public void componentMoved(ComponentEvent e) {
+        for (int i = 0; i < connections.size(); i++) {
+         Node B = connections.get(i);
+          int distance = (int) getCenter().distance(B.getCenter());
+          router.update(B.getRouter().getPort(),distance);          
+        }
+      }
+    });
   }
 
   public void createRouter() {
@@ -52,7 +65,7 @@ public class Node extends javax.swing.JPanel {
   }
 
   public void connect(Node B) {
-    router.connect(B.getRouter().getPort() + "", distance(this, B));
+    router.connect(B.getRouter().getPort(), distance(this, B));
     connections.add(B);
   }
 
@@ -63,8 +76,6 @@ public class Node extends javax.swing.JPanel {
   public ArrayList<Node> getConnections() {
     return connections;
   }
-  
-  
 
   @Override
   public String getName() {
@@ -104,6 +115,7 @@ public class Node extends javax.swing.JPanel {
     center.y += getHeight() / 2;
     return center;
   }
+  
 
   @Override
   public void paintComponent(Graphics gph) {

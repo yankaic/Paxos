@@ -1,4 +1,4 @@
-package protocol;
+package messages;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,13 +8,18 @@ import java.util.ArrayList;
  * @author Yan Kaic
  */
 public class RouteTable extends ArrayList<TableLine> implements Serializable {
-  
-static char lastId = 'A';
-private char id;
+
+  static char lastId = 'A';
+  private char id;
 
   private String author;
 
   public RouteTable() {
+   
+  }
+
+  public RouteTable(String author) {
+    this.author = author;
     init();
   }
 
@@ -39,6 +44,18 @@ private char id;
 
   public boolean has(String target) {
     return get(target) != null;
+  }
+ 
+  public void addLine(TableLine line){
+    if(!has(line)){
+      add(line);
+    }
+    else{      
+      TableLine get = get(line.getLink());
+      if(!get.getLink().equals(line.getTarget())){
+        add(line);
+      }
+    }
   }
 
   public void add(String target, String link, int distance) {
@@ -100,7 +117,7 @@ private char id;
 
   @Override
   public String toString() {
-    String output = "Author: " + author + "\t id:"+id+'\n';
+    String output = "Author: " + author + "\t id:" + id + '\n';
     for (TableLine line : this) {
       output += line.toString() + '\n';
     }
@@ -118,6 +135,10 @@ private char id;
     if (line != null) {
       remove(line);
     }
+  }
+
+  public String getId() {
+    return id + "";
   }
 
 }

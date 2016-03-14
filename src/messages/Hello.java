@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package protocol;
+package messages;
 
 import java.io.Serializable;
 
@@ -11,9 +11,17 @@ import java.io.Serializable;
  *
  * @author Yan Kaic
  */
-public class PresentationMessage implements Serializable{
+public class Hello implements Serializable{
 
   public String name;
   public int distance;
+
+  public Hello(String name, int distance) {
+    this.name = name;
+    this.distance = distance;
+  }
+
+    
+  
   
 }

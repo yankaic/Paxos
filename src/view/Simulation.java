@@ -15,9 +15,13 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.QuadCurve2D;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import messages.RouteTable;
+import messages.TableLine;
+import tools.Colors;
 
 /**
  *
@@ -162,6 +166,7 @@ public class Simulation extends javax.swing.JFrame {
   private void addNodeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNodeButtonActionPerformed
     incompleteNode = new Node();
     incompleteNode.setLocation(20, 20);
+    incompleteNode.setBackground(Colors.staticColor(incompleteNode.getName()));
     nodePanel.add(incompleteNode);
 
     incompleteNode.addMouseListener(nodeMouseClicked);
@@ -257,8 +262,6 @@ public class Simulation extends javax.swing.JFrame {
   public void paintNodePanel(Graphics2D graphics) {
     paintIncompleteLine(graphics);
     paintDirectConnections(graphics);
-    
-    
 
   }
 
@@ -270,17 +273,33 @@ public class Simulation extends javax.swing.JFrame {
         Node destination = connections.get(j);
         Point A = origin.getCenter();
         Point B = destination.getCenter();
-        graphics.drawLine(A.x, A.y, B.x, B.y);
-      }      
+//        graphics.drawLine(A.x, A.y, B.x, B.y);
+
+        RouteTable lines = new RouteTable();
+        addLines(origin, destination,lines);
+        addLines(destination, origin,lines);
+        int d = - lines.size() / 2;
+
+        for (int k = 0; k < lines.size(); k++) {
+          if(d==0){
+            d++;
+          }
+          graphics.setPaint(Colors.colorPort(lines.get(k).getTarget()));
+          
+          Point C = getCurvePoint(A, B, d++ * 10);
+          QuadCurve2D curve = new QuadCurve2D.Double(A.x, A.y, C.x, C.y, B.x, B.y);
+          graphics.draw(curve);
+        }
+      }
     }
   }
-  
-  public Node getNode(String name, Node node){
+
+  public Node getNode(String name, Node node) {
     final ArrayList<Node> list = node.getConnections();
     for (int i = 0; i < list.size(); i++) {
-      if(name.equals(list.get(i).getRouter().getPort()+"")){
+      if (name.equals(list.get(i).getRouter().getPort() + "")) {
         return list.get(i);
-      }      
+      }
     }
     return null;
   }
@@ -295,6 +314,32 @@ public class Simulation extends javax.swing.JFrame {
       int y = pointer.y - panel.y;
 
       graphics.drawLine(center.x, center.y, x, y);
+    }
+  }
+
+  private Point getCurvePoint(Point A, Point B, int h) {
+    double ca, co, hip, x, y, cos, sen;
+    co = B.getY() - A.getY();
+    ca = B.getX() - A.getX();
+    hip = A.distance(B);
+    sen = ca / hip;
+    cos = co / hip;
+    x = (cos * h);
+    y = (sen * h);
+    co /= 2;
+    ca /= 2;
+
+    return new Point((int) (A.x + ca - x), (int) (A.y + co + y));
+  }
+
+  private void addLines(Node origin, Node destination, RouteTable table) {
+    String nameB = destination.getRouter().getPort() + "";
+    RouteTable tableA = origin.getRouter().getTable();
+    for (int i = 0; i < tableA.size(); i++) {
+      TableLine line = tableA.get(i);
+      if (line.getLink().equals(nameB)) {
+        table.addLine(line);        
+      }
     }
   }
 }

@@ -1,6 +1,9 @@
-package protocol;
+package messages;
 
+import com.google.gson.Gson;
 import java.io.Serializable;
+import jdk.nashorn.internal.parser.JSONParser;
+import jdk.nashorn.internal.runtime.JSONFunctions;
 
 /**
  *
@@ -38,10 +41,16 @@ public class TableLine implements Serializable {
     this.link = link;
     this.distance = distance;
   }
+  
+  public static void load(String string){
+   
+  }
 
   @Override
   public String toString() {
     return '[' + target + ", " + link + ", " + distance + ']';
   }
+  
+ 
 
 }

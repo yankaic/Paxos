@@ -1,6 +1,6 @@
 package run;
 
-import protocol.RouteTable;
+import messages.RouteTable;
 import view.Simulation;
 
 /**
