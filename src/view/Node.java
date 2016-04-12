@@ -6,9 +6,7 @@
 package view;
 
 import java.awt.BasicStroke;
-import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.HeadlessException;
@@ -17,9 +15,11 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ContainerListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import javax.swing.JLabel;
 import network.Router;
 
 /**
@@ -31,6 +31,7 @@ public class Node extends javax.swing.JPanel {
   private static char name = 'A';
   private Router router;
   private ArrayList<Node> connections;
+  private JLabel numberLabel, categoryLabel;
 
   /**
    * Creates new form Node
@@ -47,10 +48,23 @@ public class Node extends javax.swing.JPanel {
     mouseEvents();
     setSize(45, 45);
     label.setSize(45, 45);
+    numberLabel = new JLabel("0");
+    numberLabel.setSize(80, 30);
+    numberLabel.setHorizontalAlignment(JLabel.CENTER);
+    numberLabel.setVerticalAlignment(JLabel.CENTER);
+    categoryLabel = new JLabel("undefined");
+    categoryLabel.setSize(80,30);
+    categoryLabel.setHorizontalAlignment(JLabel.CENTER);
+    categoryLabel.setVerticalAlignment(JLabel.CENTER);
+    
+    
+    
+    locationLabels();
 
     addComponentListener(new ComponentAdapter() {
       @Override
       public void componentMoved(ComponentEvent e) {
+        locationLabels();
         for (int i = 0; i < connections.size(); i++) {
          Node B = connections.get(i);
           int distance = (int) getCenter().distance(B.getCenter());
@@ -94,6 +108,24 @@ public class Node extends javax.swing.JPanel {
 
     setLocation(mouse);
   }
+
+  public JLabel getNumberLabel() {
+    return numberLabel;
+  }
+
+  public void setNumberValue(int number) {
+    this.numberLabel.setText(number +"");
+  }
+
+  public JLabel getCategoryLabel() {
+    return categoryLabel;
+  }
+
+  public void setCategory(String category) {
+    this.categoryLabel.setText(category);
+  }
+  
+  
 
   private void mouseEvents() {
     addMouseMotionListener(new MouseMotionListener() {
@@ -172,5 +204,13 @@ public class Node extends javax.swing.JPanel {
 
   public static int distance(Node A, Node B) {
     return (int) A.getCenter().distance(B.getCenter());
+  }
+
+  private void locationLabels() {
+    Point location = getLocation();
+    location.x -= getWidth()/2 -5 ;
+    
+    numberLabel.setLocation(location.x, location.y+getHeight());
+    categoryLabel.setLocation(location.x, location.y-20);
   }
 }

@@ -63,12 +63,11 @@ public class Server extends Thread {
     public void run() {
       try {
         ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-        while (socket.isConnected()) {
+     
           Object readObject = input.readObject();
 
           if (readObject instanceof RouteTable) {
             RouteTable otherTable = (RouteTable) readObject;
-            System.out.println("Destino: " + table.getId() + "  " + otherTable);
             table.merge(otherTable);
 
           }
@@ -79,7 +78,7 @@ public class Server extends Thread {
             line.update(hello.name, hello.distance);
           }
         }
-      }
+     
       catch (IOException | ClassNotFoundException ex) {
         Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
       }

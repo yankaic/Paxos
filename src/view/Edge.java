@@ -5,6 +5,7 @@
  */
 package view;
 
+import java.awt.Color;
 import java.awt.Point;
 
 /**
@@ -14,8 +15,23 @@ import java.awt.Point;
 public class Edge {
 
   private Node A, B;
+  private Color color;
 
   public Edge() {
+  }
+
+  public Edge(Node A, Node B, Color color) {
+    this.A = A;
+    this.B = B;
+    this.color = color;
+  }
+  
+  public boolean equals(Edge edge){
+    boolean vertex, invert, colors;
+    vertex = A == edge.getA() && B == edge.getB();
+    invert = A == edge.getB() && B == edge.getA();
+    colors = color == edge.getColor();
+    return colors && (vertex || invert);
   }
 
   public void add(Node node) {
@@ -55,4 +71,14 @@ public class Edge {
   public boolean isComplete() {
     return B != null;
   }
+
+  public Color getColor() {
+    return color;
+  }
+
+  public void setColor(Color color) {
+    this.color = color;
+  }
+  
+  
 }

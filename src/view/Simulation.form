@@ -113,6 +113,9 @@
               <Dimension value="[500, 400]"/>
             </Property>
           </Properties>
+          <Events>
+            <EventHandler event="mouseEntered" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="nodePanelMouseEntered"/>
+          </Events>
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_CreateCodeCustom" type="java.lang.String" value="new javax.swing.JPanel(){&#xa;@Override&#xa;  public void paintComponent(Graphics gph) {&#xa;    super.paintComponent(gph);&#xa;    Graphics2D graphics = (Graphics2D) gph.create();&#xa;    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);&#xa;    paintNodePanel(graphics);&#xa;&#xa;  }&#xa;}"/>
           </AuxValues>

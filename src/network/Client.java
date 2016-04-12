@@ -19,38 +19,60 @@ import messages.RouteTable;
  */
 public class Client {
 
-  Socket socket;
-  ObjectOutputStream output;
+//  Socket socket;
+//  ObjectOutputStream output;
 
   public Client() {
   }
 
-  public void connect(int port) {
+//  public void connect(int port) {
+//    try {
+//      socket = new Socket("localhost", port);
+//      output = new ObjectOutputStream(socket.getOutputStream());
+//    }
+//    catch (IOException ex) {
+//      Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+//    }
+//  }
+//
+//  public int getPort() {
+//    return socket.getPort();
+//  }
+
+//  public void send(RouteTable routeTable) {
+//    sendObject(routeTable);
+//  }
+
+  public static void send(Hello msg, int port) {
     try {
-      socket = new Socket("localhost", port);
-      output = new ObjectOutputStream(socket.getOutputStream());
+      Socket localSocket = new Socket("localhost", port);
+      ObjectOutputStream output = new ObjectOutputStream(localSocket.getOutputStream());
+      output.writeObject(msg);
+      output.close();
+      localSocket.close();
     }
     catch (IOException ex) {
       Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
-
-  public int getPort() {
-    return socket.getPort();
-  }
-
-  public void send(RouteTable routeTable) {
-    sendObject(routeTable);
-  }
-
-  public void send(Hello msg) {
-    sendObject(msg);
-  }
-
-  private void sendObject(Object object) {
+//
+//  private void sendObject(Object object) {
+//    try {
+//      output.writeObject(object);
+////      System.out.println("Destination: " + socket.getPort() + object);
+//    }
+//    catch (IOException ex) {
+//      Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+//    }
+//  }
+  
+  public static void send(RouteTable table, int port){
     try {
-      output.writeObject(object);
-//      System.out.println("Destination: " + socket.getPort() + object);
+      Socket socket = new Socket("localhost", port);
+      ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
+      output.writeObject(table);
+      output.close();
+      socket.close();
     }
     catch (IOException ex) {
       Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);

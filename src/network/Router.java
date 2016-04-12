@@ -35,9 +35,9 @@ public class Router {
   }
 
   public void connect(int port, int distance) {
-    Client client = new Client();
-    client.connect(port);
-    clients.add(client);
+//    Client client = new Client();
+//    client.connect(port);
+//    clients.add(client);
     table.add(port + "", port + "", distance);
   }
 
@@ -47,10 +47,12 @@ public class Router {
       public void run() {
         try {
           while (true) {
-            for (int i = 0; i < clients.size(); i++) {
-              clients.get(i).send(table);
+            for (int i = 1; i < table.size(); i++) {
+              int port = Integer.parseInt(table.get(i).getLink());
+              Client.send(table, port);
               sleep(500);
             }
+//            System.out.println(table);
             sleep(5000);
           }
         }
@@ -62,16 +64,25 @@ public class Router {
   }
 
   public void update(int port, int distance) {
-    for (int i = 0; i < clients.size(); i++) {
-      Client client = clients.get(i);
-      if (client.getPort() == port) {
-        Hello msg = new Hello(server.getPort() + "", distance);
-        client.send(msg);
-        TableLine line = table.get(port + "");
-        line.update(port + "", distance);
-        System.out.println("");
+    for (int i = 0; i < table.size(); i++) {
+      TableLine line = table.get(i);
+      if(line.getTarget().equals(port+"") && line.getTarget().equals(line.getLink())){    
+        line.update(port+"", distance);
+        Client.send(table, port);
       }
     }
+    
+    
+//    for (int i = 0; i < clients.size(); i++) {
+//      Client client = clients.get(i);
+//      if (client.getPort() == port) {
+//        Hello msg = new Hello(server.getPort() + "", distance);
+//        client.send(msg);
+//        TableLine line = table.get(port + "");
+//        line.update(port + "", distance);
+//        System.out.println("");
+//      }
+//    }
   }
 
 }

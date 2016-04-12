@@ -15,7 +15,7 @@ public class RouteTable extends ArrayList<TableLine> implements Serializable {
   private String author;
 
   public RouteTable() {
-   
+
   }
 
   public RouteTable(String author) {
@@ -45,21 +45,25 @@ public class RouteTable extends ArrayList<TableLine> implements Serializable {
   public boolean has(String target) {
     return get(target) != null;
   }
- 
-  public void addLine(TableLine line){
-    if(!has(line)){
+
+  public void addLine(TableLine line) {
+    if (line.distance == 0) {
+      //return;
+    }
+    if (!has(line)) {
       add(line);
     }
-    else{      
-      TableLine get = get(line.getLink());
-      if(!get.getLink().equals(line.getTarget())){
+    else{
+      TableLine intern = get(line.getTarget());
+      if(line.getDistance()< intern.getDistance()){
+        remove(intern);
         add(line);
       }
     }
   }
 
   public void add(String target, String link, int distance) {
-    add(new TableLine(target, link, distance));
+    addLine(new TableLine(target, link, distance));
   }
 
   public TableLine get(String target) {
@@ -83,17 +87,17 @@ public class RouteTable extends ArrayList<TableLine> implements Serializable {
 
   private void union(RouteTable othertable) {
     int distance = get(othertable.getAuthor()).getDistance();
-    for (TableLine line : othertable) {
+    for (TableLine otherLine : othertable) {
       try {
-        TableLine thisline = get(line.getTarget());
+        TableLine thisline = get(otherLine.getTarget());
         int thisLineDistance = thisline.getDistance();
-        int thatLineDistance = line.getDistance() + distance;
+        int thatLineDistance = otherLine.getDistance() + distance;
         if (thatLineDistance < thisLineDistance) {
           thisline.update(othertable.getAuthor(), thatLineDistance);
         }
       }
       catch (NullPointerException e) {
-        add(line.getTarget(), othertable.author, line.getDistance() + distance);
+        add(otherLine.getTarget(), othertable.author, otherLine.getDistance() + distance);
       }
     }
   }
@@ -103,12 +107,18 @@ public class RouteTable extends ArrayList<TableLine> implements Serializable {
     for (int i = 0; i < size(); i++) {
       TableLine line = get(i);
       if (line.getLink().equals(othertable.getAuthor())) {
-        if (othertable.has(line)) {
+        if (othertable.has(line.getTarget())) {
           int otherDistance = othertable.get(line.getTarget()).getDistance();
           line.update(othertable.getAuthor(), distance + otherDistance);
         }
         else {
           remove(line);
+        }
+      }
+      if (line.getLink().equals(othertable.getAuthor())) {
+        if (line.getLink().equals(line.getTarget())) {
+          int dist = othertable.get(getAuthor()).getDistance();
+          line.update(othertable.getAuthor(), dist);
         }
       }
     }
