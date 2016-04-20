@@ -5,6 +5,8 @@
  */
 package network;
 
+import consensus.Actor;
+import consensus.messages.ConsensusMessage;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.ServerSocket;
@@ -23,11 +25,16 @@ public class Server extends Thread {
 
   private ServerSocket serverSocket;
   private RouteTable table;
+  private Actor actor;
+  private Client client;
 
   Server(RouteTable table, int port) {
     try {
       serverSocket = new ServerSocket(port);
       this.table = table;
+      this.actor = new Actor(port, table);
+      this.client = new Client(table);
+      this.actor.setClient(client);
     }
     catch (IOException ex) {
       Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
@@ -36,6 +43,14 @@ public class Server extends Thread {
 
   int getPort() {
     return serverSocket.getLocalPort();
+  }
+
+  public void setActor(Actor actor) {
+    this.actor = actor;
+  }
+
+  public Actor getActor() {
+    return actor;
   }
 
   @Override
@@ -63,22 +78,32 @@ public class Server extends Thread {
     public void run() {
       try {
         ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
-     
-          Object readObject = input.readObject();
 
-          if (readObject instanceof RouteTable) {
-            RouteTable otherTable = (RouteTable) readObject;
-            table.merge(otherTable);
+        Object readObject = input.readObject();
 
+        if (readObject instanceof RouteTable) {
+          RouteTable otherTable = (RouteTable) readObject;
+          table.merge(otherTable);
+
+        }
+
+        if (readObject instanceof Hello) {
+          Hello hello = (Hello) readObject;
+          TableLine line = table.get(hello.name);
+          line.update(hello.name, hello.distance);
+        }
+
+        if (readObject instanceof ConsensusMessage) {
+          ConsensusMessage message = (ConsensusMessage) readObject;
+          if (message.receiver == getPort()) {
+            actor.receive(message);
           }
-
-          if (readObject instanceof Hello) {
-            Hello hello = (Hello) readObject;
-            TableLine line = table.get(hello.name);
-            line.update(hello.name, hello.distance);
+          else {
+            client.sendObject(message, message.receiver);
           }
         }
-     
+      }
+
       catch (IOException | ClassNotFoundException ex) {
         Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
       }

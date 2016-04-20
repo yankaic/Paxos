@@ -5,6 +5,7 @@
  */
 package network;
 
+import consensus.messages.ConsensusMessage;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
@@ -12,6 +13,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import messages.Hello;
 import messages.RouteTable;
+import messages.TableLine;
 
 /**
  *
@@ -19,35 +21,27 @@ import messages.RouteTable;
  */
 public class Client {
 
-//  Socket socket;
-//  ObjectOutputStream output;
+  private final RouteTable table;
 
-  public Client() {
+  public Client(RouteTable table) {
+    this.table = table;
   }
 
-//  public void connect(int port) {
-//    try {
-//      socket = new Socket("localhost", port);
-//      output = new ObjectOutputStream(socket.getOutputStream());
-//    }
-//    catch (IOException ex) {
-//      Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-//    }
-//  }
-//
-//  public int getPort() {
-//    return socket.getPort();
-//  }
+  public void send(Hello msg, int port) {
+    sendObject(msg, port);
+  }
 
-//  public void send(RouteTable routeTable) {
-//    sendObject(routeTable);
-//  }
+  public void send(RouteTable table, int port) {
+    sendObject(table, port);
+  }
 
-  public static void send(Hello msg, int port) {
+  public void sendObject(Object object, int port) {
     try {
+      TableLine line = table.get(port + "");
+      port = Integer.parseInt(line.getLink());
       Socket localSocket = new Socket("localhost", port);
       ObjectOutputStream output = new ObjectOutputStream(localSocket.getOutputStream());
-      output.writeObject(msg);
+      output.writeObject(object);
       output.close();
       localSocket.close();
     }
@@ -55,28 +49,27 @@ public class Client {
       Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
-//
-//  private void sendObject(Object object) {
-//    try {
-//      output.writeObject(object);
-////      System.out.println("Destination: " + socket.getPort() + object);
-//    }
-//    catch (IOException ex) {
-//      Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-//    }
-//  }
-  
-  public static void send(RouteTable table, int port){
-    try {
-      Socket socket = new Socket("localhost", port);
-      ObjectOutputStream output = new ObjectOutputStream(socket.getOutputStream());
-      output.writeObject(table);
-      output.close();
-      socket.close();
+
+  public void multicast(Object obj) {
+    TableLine line;
+    for (int i = 1; i < table.size(); i++) {
+      line = table.get(i);
+      if (line.isDirect()) {
+        int port = Integer.parseInt(line.getLink());
+        sendObject(obj, port);
+      }
     }
-    catch (IOException ex) {
-      Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+  }
+
+  public void broadcast(ConsensusMessage message) {
+    for (int i = 0; i < table.size(); i++) {
+      TableLine line = table.get(i);
+      message.receiver = Integer.parseInt(line.getTarget());
+      int port = Integer.parseInt(line.getLink());
+      sendObject(message, port);
+
     }
+
   }
 
 }

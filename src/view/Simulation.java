@@ -5,6 +5,7 @@
  */
 package view;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.HeadlessException;
@@ -300,15 +301,21 @@ public class Simulation extends javax.swing.JFrame {
         if (d == 0) {
           d++;
         }
-        graphics.setPaint(edges.get(k).getColor());
-
-        Point C = getCurvePoint(A, B, d++ * 15);
-        QuadCurve2D curve = new QuadCurve2D.Double(A.x, A.y, C.x, C.y, B.x, B.y);
-        graphics.draw(curve);
+        graphics.setPaint(Color.GRAY);
+        graphics.drawLine(A.x, A.y, B.x, B.y);
+//        d = paintCurve(graphics, k, A, B, d);
       }
 
     }
 
+  }
+
+  private int paintCurve(Graphics2D graphics, int k, Point A, Point B, int d) {
+    graphics.setPaint(edges.get(k).getColor());
+    Point C = getCurvePoint(A, B, d++ * 15);
+    QuadCurve2D curve = new QuadCurve2D.Double(A.x, A.y, C.x, C.y, B.x, B.y);
+    graphics.draw(curve);
+    return d;
   }
 
   public Node getNode(String name, Node node) {

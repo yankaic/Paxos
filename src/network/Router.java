@@ -5,6 +5,7 @@
  */
 package network;
 
+import consensus.Actor;
 import java.util.ArrayList;
 import messages.Hello;
 import messages.RouteTable;
@@ -16,12 +17,15 @@ public class Router {
   private ArrayList<Client> clients;
   private Server server;
   private static int lastPort = 3030;
+  private Client client;
 
   public Router() {
     table = new RouteTable(lastPort + "");
     clients = new ArrayList<>();
     server = new Server(table, lastPort);
     server.start();
+    client = new Client(table);
+
     refresh();
     lastPort++;
   }
@@ -29,9 +33,13 @@ public class Router {
   public int getPort() {
     return server.getPort();
   }
-  
-  public RouteTable getTable(){
+
+  public RouteTable getTable() {
     return table;
+  }
+  
+  public Actor getActor(){
+    return server.getActor();
   }
 
   public void connect(int port, int distance) {
@@ -49,10 +57,9 @@ public class Router {
           while (true) {
             for (int i = 1; i < table.size(); i++) {
               int port = Integer.parseInt(table.get(i).getLink());
-              Client.send(table, port);
+              client.send(table, port);
               sleep(500);
             }
-//            System.out.println(table);
             sleep(5000);
           }
         }
@@ -66,13 +73,12 @@ public class Router {
   public void update(int port, int distance) {
     for (int i = 0; i < table.size(); i++) {
       TableLine line = table.get(i);
-      if(line.getTarget().equals(port+"") && line.getTarget().equals(line.getLink())){    
-        line.update(port+"", distance);
-        Client.send(table, port);
+      if (line.getTarget().equals(port + "") && line.getTarget().equals(line.getLink())) {
+        line.update(port + "", distance);
+        client.send(table, port);
       }
     }
-    
-    
+
 //    for (int i = 0; i < clients.size(); i++) {
 //      Client client = clients.get(i);
 //      if (client.getPort() == port) {

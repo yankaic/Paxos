@@ -46,6 +46,7 @@ public class TableLine implements Serializable {
    
   }
 
+
   @Override
   public String toString() {
     return '[' + target + ", " + link + ", " + distance + ']';

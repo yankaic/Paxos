@@ -5,27 +5,20 @@
  */
 package test;
 
-import com.google.gson.Gson;
-import messages.RouteTable;
-
 /**
  *
  * @author Yan Kaic
  */
 public class jsonTest {
   public static void main(String[] args) {
-    RouteTable table = new RouteTable("A");
-    table.add("B", "B", 90);
-    table.add("C", "B", 90);
-    table.add("D", "B", 90);
-    table.add("E", "B", 90);
-    System.out.println(table);
+    Filho filho = new Filho('a');
     
-    Gson parse = new Gson();
-    String str = parse.toJson(table);
-    System.out.println(str);
-    RouteTable other = parse.fromJson(str, RouteTable.class);
-    System.out.println(other);
+    if(filho instanceof Pai){
+      System.out.println("eu escolhi pai");
+    }
+    else{
+      System.out.println("eu escolhi filho");
+    }
   }
   
 }
