@@ -5,7 +5,6 @@ import java.util.concurrent.Semaphore;
 
 public abstract class Agent extends Thread {
 
-  protected int value;
 
   protected final Semaphore mutex;
 
@@ -18,6 +17,14 @@ public abstract class Agent extends Thread {
 
   public Actor getActor() {
     return actor;
+  }
+  
+  public void setValue(int value){
+    actor.setValue(value);
+  }
+  
+  public int getValue(){
+    return actor.getValue();
   }
   
   

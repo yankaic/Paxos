@@ -12,6 +12,7 @@ import network.Client;
 public class Actor{
 
   private final int id;
+  private int value;
 
   private final RouteTable nodes;
 
@@ -70,5 +71,16 @@ public class Actor{
   public int getId() {
     return id;
   }
+
+  public int getValue() {
+    return value;
+  }
+
+  public void setValue(int value) {
+    this.value = value;
+  }
+
+  
+  
 
 }

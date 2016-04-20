@@ -21,6 +21,7 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import javax.swing.JLabel;
 import network.Router;
+import tools.Colors;
 
 /**
  *
@@ -31,7 +32,6 @@ public class Node extends javax.swing.JPanel {
   private static char name = 'A';
   private Router router;
   private ArrayList<Node> connections;
-  private JLabel numberLabel, categoryLabel;
 
   /**
    * Creates new form Node
@@ -47,24 +47,11 @@ public class Node extends javax.swing.JPanel {
     label.setText(name++ + "");
     mouseEvents();
     setSize(45, 45);
-    label.setSize(45, 45);
-    numberLabel = new JLabel("0");
-    numberLabel.setSize(80, 30);
-    numberLabel.setHorizontalAlignment(JLabel.CENTER);
-    numberLabel.setVerticalAlignment(JLabel.CENTER);
-    categoryLabel = new JLabel("undefined");
-    categoryLabel.setSize(80,30);
-    categoryLabel.setHorizontalAlignment(JLabel.CENTER);
-    categoryLabel.setVerticalAlignment(JLabel.CENTER);
+    label.setSize(45, 45);    
     
-    
-    
-    locationLabels();
-
-    addComponentListener(new ComponentAdapter() {
+        addComponentListener(new ComponentAdapter() {
       @Override
       public void componentMoved(ComponentEvent e) {
-        locationLabels();
         for (int i = 0; i < connections.size(); i++) {
          Node B = connections.get(i);
           int distance = (int) getCenter().distance(B.getCenter());
@@ -109,21 +96,6 @@ public class Node extends javax.swing.JPanel {
     setLocation(mouse);
   }
 
-  public JLabel getNumberLabel() {
-    return numberLabel;
-  }
-
-  public void setNumberValue(int number) {
-    this.numberLabel.setText(number +"");
-  }
-
-  public JLabel getCategoryLabel() {
-    return categoryLabel;
-  }
-
-  public void setCategory(String category) {
-    this.categoryLabel.setText(category);
-  }
   
   
 
@@ -155,7 +127,12 @@ public class Node extends javax.swing.JPanel {
     graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
     graphics.setPaint(backColor);
     graphics.fillOval(1, 1, getWidth() - 3, getHeight() - 3);
-    graphics.setPaint(getBackground());
+    try {
+      graphics.setPaint(Colors.staticColor(getRouter().getConsensusValue()));
+    }
+    catch (Exception e) {
+      graphics.setColor(Color.GRAY);
+    }
     graphics.setStroke(new BasicStroke(2));
     graphics.drawOval(1, 1, getWidth() - 3, getHeight() - 3);
     graphics.setPaint(Color.black);
@@ -206,11 +183,4 @@ public class Node extends javax.swing.JPanel {
     return (int) A.getCenter().distance(B.getCenter());
   }
 
-  private void locationLabels() {
-    Point location = getLocation();
-    location.x -= getWidth()/2 -5 ;
-    
-    numberLabel.setLocation(location.x, location.y+getHeight());
-    categoryLabel.setLocation(location.x, location.y-20);
-  }
 }

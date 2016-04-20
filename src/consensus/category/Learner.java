@@ -32,15 +32,14 @@ public class Learner extends Agent {
       while (true) {
         for (int count = 0; count <= getActor().getNodes().size() / 2; count++) {
           mutex.acquire();
-          if (received.value != value) {
-            value = received.value;
+          if (received.value != getValue()) {
+            setValue(received.value);
             count = 0;
           }
         }
         received.done = true;
         received.sender = getActor().getId();
         getActor().getClient().broadcast(received);
-        System.out.println("Valor Escolhido: " + value);
       }
     }
     catch (InterruptedException ex) {

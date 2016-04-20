@@ -178,10 +178,8 @@ public class Simulation extends javax.swing.JFrame {
   private void addNodeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addNodeButtonActionPerformed
     incompleteNode = new Node();
     incompleteNode.setLocation(20, 20);
-    incompleteNode.setBackground(Colors.staticColor(incompleteNode.getName()));
+    incompleteNode.setBackground(Color.GRAY);
     nodePanel.add(incompleteNode);
-    nodePanel.add(incompleteNode.getCategoryLabel());
-    nodePanel.add(incompleteNode.getNumberLabel());
 
     incompleteNode.addMouseListener(nodeMouseClicked);
     incompleteNode.addMouseListener(new MouseAdapter() {
@@ -362,7 +360,7 @@ public class Simulation extends javax.swing.JFrame {
     for (int i = 1; i < tableA.size(); i++) {
       TableLine line = tableA.get(i);
       if (line.getLink().equals(nameB)) {
-        Edge edge = new Edge(origin, destination, Colors.colorPort(line.getTarget()));
+        Edge edge = new Edge(origin, destination, Colors.staticColor(Integer.parseInt(line.getTarget())));
         edges.addEdge(edge);
       }
     }

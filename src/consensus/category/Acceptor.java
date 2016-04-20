@@ -28,13 +28,12 @@ public class Acceptor extends Agent {
     suggestion.sender = getActor().getId();
     getActor().getClient().sendObject(suggestion, suggestion.receiver);
 
-    System.out.println("acceptor enviando:\t" + suggestion);
   }
 
   public void acceptSuggestion() {
     suggestion.accept = true;
     serial = suggestion.serial;
-    value = suggestion.value;
+    setValue(suggestion.value);
     replyMessage();
   }
 
@@ -62,7 +61,7 @@ public class Acceptor extends Agent {
       while (true) {
         mutex.acquire();
         suggestion.seen = true;
-        if (suggestion.accord) {
+        if (suggestion.accord && suggestion.serial == serial) {
           confirmSuggestion();
         }
         else if (suggestion.serial >= serial) {

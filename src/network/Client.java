@@ -48,6 +48,9 @@ public class Client {
     catch (IOException ex) {
       Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
     }
+    catch(NullPointerException np){
+      
+    }
   }
 
   public void multicast(Object obj) {

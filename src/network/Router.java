@@ -41,6 +41,10 @@ public class Router {
   public Actor getActor(){
     return server.getActor();
   }
+  
+  public int getConsensusValue(){
+    return getActor().getValue();
+  }
 
   public void connect(int port, int distance) {
 //    Client client = new Client();

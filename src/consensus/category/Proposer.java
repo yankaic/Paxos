@@ -17,23 +17,28 @@ public class Proposer extends Agent {
   public Proposer(Actor actor) {
     super(actor);
     this.serial = 0;
-    this.value = 0;
   }
 
   /**
    *
    */
   public void createSuggestion() {
-    serial = (int) (Math.random() * 10) + 10 * round++;
-    value = (int) (Math.random() * serial * 10);
-    Suggestion propose = new Suggestion(getActor().getId(), getActor().getId());
-    propose.value = value;
-    propose.serial = serial;
-    propose.seen = false;
-    propose.accept = false;
-    propose.accord = false;
-    System.out.println("\nProposer criando:\t" + propose);
-    getActor().getClient().broadcast(propose);
+    try {
+      serial = (int) (Math.random() * 10) + getValue();
+      int value = (int) (Math.random() * serial + serial / 3.0*2.0);
+      setValue(value);
+      Suggestion propose = new Suggestion(getActor().getId(), getActor().getId());
+      propose.value = value;
+      propose.serial = serial;
+      propose.seen = false;
+      propose.accept = false;
+      propose.accord = false;
+      sleep(1000);
+      getActor().getClient().broadcast(propose);
+    }
+    catch (InterruptedException ex) {
+      Logger.getLogger(Proposer.class.getName()).log(Level.SEVERE, null, ex);
+    }
   }
 
   /**
@@ -41,14 +46,11 @@ public class Proposer extends Agent {
    */
   public void confirmSuggestion() {
     Suggestion propose = new Suggestion(getActor().getId(), getActor().getId());
-    propose.value = value;
+    propose.value = getValue();
     propose.serial = serial;
     propose.accord = true;
     propose.accept = true;
     propose.seen = true;
-
-    System.out.println("Proposer confirmando:\t" + propose);
-
     getActor().getClient().broadcast(propose);
 
   }
@@ -61,7 +63,6 @@ public class Proposer extends Agent {
         suggestion = (Suggestion) message;
         mutex.release();
       }
-//      System.out.println("Proposer recebendo" + message);
     }
   }
 
@@ -69,9 +70,11 @@ public class Proposer extends Agent {
   public void run() {
     int accepteds = 0;
     int recuseds = 0;
+    int delay;
     while (true) {
       try {
-        sleep(5000);
+        delay = (int) (Math.random() * 5000 + 5000);
+        sleep(delay);
         createSuggestion();
         accepteds = 0;
         recuseds = 0;
@@ -90,7 +93,6 @@ public class Proposer extends Agent {
         if (accepteds > recuseds) {
           confirmSuggestion();
         }
-//        System.out.println("saindo do looping\n");
       }
       catch (InterruptedException ex) {
         Logger.getLogger(Proposer.class.getName()).log(Level.SEVERE, null, ex);
